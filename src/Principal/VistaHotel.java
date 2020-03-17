@@ -1,17 +1,28 @@
 package Principal;
 
 
+import Controllers.UserlogJpaController;
+import Entity.Userlog;
 import java.text.SimpleDateFormat;
+import javax.persistence.EntityManagerFactory;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class VistaHotel extends javax.swing.JFrame {
+    
+    private final EntityManagerFactory factory;
+    private final Userlog userLog;
+    private final UserlogJpaController ctrlLog;
 
     private int valorTotal = 0;
     DefaultTableModel modelo = new DefaultTableModel();
 
-    public VistaHotel() {
+    public VistaHotel(EntityManagerFactory factory, Userlog userLog, UserlogJpaController ctrlLog) {
         initComponents();
+        this.factory = factory;
+        this.userLog = userLog;
+        this.ctrlLog = ctrlLog;
+        this.setTitle("Hotel");
         this.modelo.addColumn("Fecha");
     }
 

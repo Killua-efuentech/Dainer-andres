@@ -51,7 +51,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="jbNuevo" min="-2" pref="131" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jbCalcular" min="-2" pref="131" max="-2" attributes="0"/>
+                          <Component id="jbAgregar" min="-2" pref="131" max="-2" attributes="0"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Component id="jbBuscar" min="-2" pref="131" max="-2" attributes="0"/>
                       </Group>
@@ -97,7 +97,7 @@
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jbNuevo" alignment="3" min="-2" pref="43" max="-2" attributes="0"/>
-                      <Component id="jbCalcular" alignment="3" min="-2" pref="46" max="-2" attributes="0"/>
+                      <Component id="jbAgregar" alignment="3" min="-2" pref="46" max="-2" attributes="0"/>
                       <Component id="jbBuscar" alignment="3" min="-2" pref="46" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
@@ -195,12 +195,13 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jbNuevoActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JButton" name="jbCalcular">
+        <Component class="javax.swing.JButton" name="jbAgregar">
           <Properties>
             <Property name="text" type="java.lang.String" value="Agregar"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jbCalcularActionPerformed"/>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jbAgregarMouseClicked"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jbAgregarActionPerformed"/>
           </Events>
         </Component>
         <Component class="javax.swing.JComboBox" name="jcbTiempo">

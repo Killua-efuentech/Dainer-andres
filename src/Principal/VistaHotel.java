@@ -1,11 +1,16 @@
 package Principal;
 
 
+import Controllers.IngventaJpaController;
 import Controllers.UserlogJpaController;
+import Entity.Ingventa;
 import Entity.Userlog;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.EntityManagerFactory;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 public class VistaHotel extends javax.swing.JFrame {
@@ -13,17 +18,87 @@ public class VistaHotel extends javax.swing.JFrame {
     private final EntityManagerFactory factory;
     private final Userlog userLog;
     private final UserlogJpaController ctrlLog;
-
-    private int valorTotal = 0;
-    DefaultTableModel modelo = new DefaultTableModel();
+    Ingventa ingVenta = null;
+    IngventaJpaController ctrlVenta = null;
+    List<String> oFaltantes = null;
+    List<JTextField> campoFaltante = null;
 
     public VistaHotel(EntityManagerFactory factory, Userlog userLog, UserlogJpaController ctrlLog) {
         initComponents();
         this.factory = factory;
         this.userLog = userLog;
         this.ctrlLog = ctrlLog;
+        ctrlVenta = new IngventaJpaController(factory);
         this.setTitle("Hotel");
-        this.modelo.addColumn("Fecha");
+    }
+    
+    private boolean validaDatosVentaObligatorios() {
+        boolean obligatorio = false;
+        oFaltantes = new ArrayList<>();
+        campoFaltante = new ArrayList<>();
+
+        if (jtfHabitacion.getText().trim().isEmpty()) {
+            oFaltantes.add("Habitación");
+            campoFaltante.add(jtfHabitacion);
+        }
+        if (jtfValor.getText().trim().isEmpty()) {
+            oFaltantes.add("Valor");
+            campoFaltante.add(jtfValor);
+        }
+        if (jcbTiempo.getSelectedItem() == "Tiempo") {
+            oFaltantes.add("Tiempo");
+            campoFaltante.add(jtfValor);
+        }
+        if (jcbTipo.getSelectedItem() == "Tipo") {
+            oFaltantes.add("Tipo");
+            campoFaltante.add(jtfValor);
+        }
+        if (jdcFecha.getDate() == null) {
+            oFaltantes.add("Fecha");
+            campoFaltante.add(jtfValor);
+        }
+        if (campoFaltante.size() > 0) {
+            obligatorio = false;
+        } else {
+            obligatorio = true;
+        }
+        return obligatorio;
+    }
+    
+    private void guardaVenta() {
+        if (validaDatosVentaObligatorios()) {
+            
+            ingVenta = new Ingventa();
+            
+            //ingVenta.setIdlog(userLog);
+            ingVenta.setFecha(jdcFecha.getDate().toString());
+            ingVenta.setHabitacion(jtfHabitacion.getText().toUpperCase());
+            ingVenta.setValor(Double.parseDouble(jtfValor.getText().toUpperCase()));
+            ingVenta.setTiempo(jcbTiempo.getSelectedItem().toString());
+            ingVenta.setTipo(jcbTipo.getSelectedItem().toString());
+            ingVenta.setEstado(1);
+            ctrlVenta.create(ingVenta);
+            JOptionPane.showMessageDialog(null, "Usuario creado con exito!");
+            
+            limpiar();
+            
+        } else {
+            String mensaje = "";
+            for (int i = 0; i < oFaltantes.size(); i++) {
+                mensaje += oFaltantes.get(i) + "\n";
+            }
+            JOptionPane.showMessageDialog(null, "Campos requeridos para continuar:\n\n" + mensaje, "Validacion de datos", JOptionPane.INFORMATION_MESSAGE);
+            if (campoFaltante.size() > 0) {
+                campoFaltante.get(0).requestFocus();
+            }
+        }
+    }
+    
+    private void limpiar() {
+        jtfHabitacion.setText("");
+        jtfValor.setText("");
+        jcbTiempo.setSelectedIndex(0);
+        jcbTipo.setSelectedIndex(0);
     }
 
     @SuppressWarnings("unchecked")
@@ -36,7 +111,7 @@ public class VistaHotel extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jtTabla = new javax.swing.JTable();
         jbNuevo = new javax.swing.JButton();
-        jbCalcular = new javax.swing.JButton();
+        jbAgregar = new javax.swing.JButton();
         jcbTiempo = new javax.swing.JComboBox<>();
         jcbTipo = new javax.swing.JComboBox<>();
         jdcFecha = new com.toedter.calendar.JDateChooser();
@@ -70,10 +145,15 @@ public class VistaHotel extends javax.swing.JFrame {
             }
         });
 
-        jbCalcular.setText("Agregar");
-        jbCalcular.addActionListener(new java.awt.event.ActionListener() {
+        jbAgregar.setText("Agregar");
+        jbAgregar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jbAgregarMouseClicked(evt);
+            }
+        });
+        jbAgregar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jbCalcularActionPerformed(evt);
+                jbAgregarActionPerformed(evt);
             }
         });
 
@@ -100,7 +180,7 @@ public class VistaHotel extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jbNuevo, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jbCalcular, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jbAgregar, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(jbBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 936, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -135,7 +215,7 @@ public class VistaHotel extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jbNuevo, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jbCalcular, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jbAgregar, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jbBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)
@@ -161,72 +241,33 @@ public class VistaHotel extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jbCalcularActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbCalcularActionPerformed
+    private void jbAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbAgregarActionPerformed
 
-        String tiempo = (String) jcbTiempo.getSelectedItem();
-        String tipo = (String) jcbTipo.getSelectedItem();
-
-        if (!jtfHabitacion.getText().isEmpty()) {
-            if (!tiempo.equals("Tiempo")) {
-                if (!tipo.equals("Tipo")) {
-                    if (!jtfValor.getText().isEmpty()) {
-                        jtfHabitacion.getText();
-                        jtfValor.getText();
-                        cargarDatos();
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Ingrese un valor...");
-                        jtfValor.requestFocus();
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(null, "Seleccione un Tipo...");
-                    jcbTipo.requestFocus();
-                }
-            } else {
-                JOptionPane.showMessageDialog(null, "Seleccione un tiempo...");
-                jcbTiempo.requestFocus();
-            }
-        } else {
-            JOptionPane.showMessageDialog(null, "Ingrese una habitación...");
-            jtfHabitacion.requestFocus();
-        }
-    }//GEN-LAST:event_jbCalcularActionPerformed
+    }//GEN-LAST:event_jbAgregarActionPerformed
 
     private void jbNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbNuevoActionPerformed
-        jtfHabitacion.setText("");
-        jtfValor.setText("");
-        jcbTiempo.setSelectedIndex(0);
-        jcbTipo.setSelectedIndex(0);       
+        limpiar();
     }//GEN-LAST:event_jbNuevoActionPerformed
 
     private void jtTablaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jtTablaKeyPressed
-        if (evt.getKeyCode() == evt.VK_DELETE) {
-            if (JOptionPane.showConfirmDialog(this, "¿Seguro qué desea eliminar este registros?") == JOptionPane.YES_OPTION) {
-                modelo.removeRow(jtTabla.getSelectedRow());
-            }
-        }
+       
     }//GEN-LAST:event_jtTablaKeyPressed
 
     private void jbBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbBuscarActionPerformed
 
-        JOptionPane.showInputDialog("Ingrese fecha");
-        cargarDatos();
     }//GEN-LAST:event_jbBuscarActionPerformed
 
-    public void cargarDatos() {
-        SimpleDateFormat formatoFecha = new SimpleDateFormat("dd-MM-yyyy");
-        String date = formatoFecha.format(jdcFecha.getDate()); 
-        
-        modelo = (DefaultTableModel) jtTabla.getModel();
-        Object datos[] = {date, jtfHabitacion.getText(), jtfValor.getText(), jcbTiempo.getSelectedItem(), jcbTipo.getSelectedItem()};
-        modelo.addRow(datos);
-    }
+    private void jbAgregarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jbAgregarMouseClicked
+        guardaVenta();
+    }//GEN-LAST:event_jbAgregarMouseClicked
+
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JButton jbAgregar;
     private javax.swing.JButton jbBuscar;
-    private javax.swing.JButton jbCalcular;
     private javax.swing.JButton jbNuevo;
     private javax.swing.JComboBox<String> jcbTiempo;
     private javax.swing.JComboBox<String> jcbTipo;

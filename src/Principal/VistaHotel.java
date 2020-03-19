@@ -26,6 +26,7 @@ public class VistaHotel extends javax.swing.JFrame {
     IngventaJpaController ctrlVenta = null;
     List<String> oFaltantes = null;
     List<JTextField> campoFaltante = null;
+    Object dato[] = null;
     DefaultTableModel model;
 
     public VistaHotel(EntityManagerFactory factory, Userlog userLog, UserlogJpaController ctrlLog) {
@@ -35,6 +36,11 @@ public class VistaHotel extends javax.swing.JFrame {
         this.ctrlLog = ctrlLog;
         ctrlVenta = new IngventaJpaController(factory);
         this.setTitle("Hotel");
+        setCargarTabla();
+
+        hilodatos ut = new hilodatos();
+        Thread r = new Thread(ut);
+        r.start();
     }
     
     private boolean validaDatosVentaObligatorios() {
@@ -91,6 +97,11 @@ public class VistaHotel extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Venta guardada con EXITO!");
             
             limpiar();
+            setCargarTabla();
+
+            hilodatos ut = new hilodatos();
+            Thread r = new Thread(ut);
+            r.start();
             
         } else {
             String mensaje = "";
@@ -147,16 +158,37 @@ public class VistaHotel extends javax.swing.JFrame {
         jTable2.getTableHeader().setReorderingAllowed(false);
         jTable2.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         setOcultarColumnas(jTable2, new int[]{0});
-//        jTable2.getColumnModel().getColumn(1).setMinWidth(100);
-//        jTable2.getTableHeader().getColumnModel().getColumn(1).setMaxWidth(100);
-//        jTable2.getColumnModel().getColumn(2).setMinWidth(100);
-//        jTable2.getTableHeader().getColumnModel().getColumn(2).setMaxWidth(100);
-//        jTable2.getColumnModel().getColumn(3).setMinWidth(100);
-//        jTable2.getTableHeader().getColumnModel().getColumn(3).setMaxWidth(100);
-//        jTable2.getColumnModel().getColumn(4).setMinWidth(180);
-//        jTable2.getTableHeader().getColumnModel().getColumn(4).setMaxWidth(180);
-//        jTable2.getColumnModel().getColumn(5).setMinWidth(50);
-//        jTable2.getTableHeader().getColumnModel().getColumn(5).setMaxWidth(50);
+    }
+    
+    private void setDatos() {
+        while (model.getRowCount() > 0) {
+            model.removeRow(0);
+        }
+
+        List<Ingventa> gu = ctrlVenta.obtenerVentas();
+
+        for (int i = 0; i < gu.size(); i++) {
+            ingVenta = gu.get(i);
+            model.addRow(dato);
+            model.setValueAt(gu, model.getRowCount() - 1, 0);
+            model.setValueAt(ingVenta.getFecha(), model.getRowCount() - 1, 1);
+            model.setValueAt(ingVenta.getHabitacion(), model.getRowCount() - 1, 2);
+            model.setValueAt(ingVenta.getValor(), model.getRowCount() - 1, 3);
+            model.setValueAt(ingVenta.getTiempo(), model.getRowCount() - 1, 4);
+            model.setValueAt(ingVenta.getTipo(), model.getRowCount() - 1, 5);
+        }
+    }
+    
+    public class hilodatos extends Thread {
+
+        public hilodatos() {
+        }
+
+        @Override
+        public void run() {
+            setDatos();
+            this.stop();
+        }
     }
     
     private void limpiar() {

@@ -165,4 +165,15 @@ public class IngventaJpaController implements Serializable {
         }
     }
     
+    public List<Ingventa> obtenerVentas() {
+        EntityManager em = getEntityManager();
+        try {
+            return em.createQuery("SELECT c FROM Ingventa c WHERE c.fecha!=''")
+                    .setHint("javax.persistence.cache.storeMode", "REFRESH")
+                    .getResultList();
+        } finally {
+            em.close();
+        }
+    }
+    
 }

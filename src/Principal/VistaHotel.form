@@ -232,7 +232,7 @@
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
           </AuxValues>
         </Component>
-        <Component class="com.toedter.calendar.JDateChooser" name="jdcFecha">
+        <Component class="org.netbeans.modules.form.InvalidComponent" name="jdcFecha">
           <Properties>
             <Property name="dateFormatString" type="java.lang.String" value="dd/MMM/yyyy "/>
           </Properties>

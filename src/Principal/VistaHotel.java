@@ -114,7 +114,7 @@ public class VistaHotel extends javax.swing.JFrame {
         jbAgregar = new javax.swing.JButton();
         jcbTiempo = new javax.swing.JComboBox<>();
         jcbTipo = new javax.swing.JComboBox<>();
-        jdcFecha = new com.toedter.calendar.JDateChooser();
+        jdcFecha = new org.netbeans.modules.form.InvalidComponent();
         jbBuscar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -160,8 +160,6 @@ public class VistaHotel extends javax.swing.JFrame {
         jcbTiempo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Tiempo", "Rato", "Amanecida" }));
 
         jcbTipo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Tipo", "Sencilla", "Temática" }));
-
-        jdcFecha.setDateFormatString("dd/MMM/yyyy ");
 
         jbBuscar.setText("Buscar");
         jbBuscar.addActionListener(new java.awt.event.ActionListener() {
@@ -271,7 +269,7 @@ public class VistaHotel extends javax.swing.JFrame {
     private javax.swing.JButton jbNuevo;
     private javax.swing.JComboBox<String> jcbTiempo;
     private javax.swing.JComboBox<String> jcbTipo;
-    private com.toedter.calendar.JDateChooser jdcFecha;
+    private org.netbeans.modules.form.InvalidComponent jdcFecha;
     private javax.swing.JTable jtTabla;
     private javax.swing.JTextField jtfHabitacion;
     private javax.swing.JTextField jtfValor;

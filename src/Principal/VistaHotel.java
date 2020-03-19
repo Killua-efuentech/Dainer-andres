@@ -5,12 +5,16 @@ import Controllers.IngventaJpaController;
 import Controllers.UserlogJpaController;
 import Entity.Ingventa;
 import Entity.Userlog;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
 public class VistaHotel extends javax.swing.JFrame {
@@ -22,6 +26,7 @@ public class VistaHotel extends javax.swing.JFrame {
     IngventaJpaController ctrlVenta = null;
     List<String> oFaltantes = null;
     List<JTextField> campoFaltante = null;
+    DefaultTableModel model;
 
     public VistaHotel(EntityManagerFactory factory, Userlog userLog, UserlogJpaController ctrlLog) {
         initComponents();
@@ -70,15 +75,20 @@ public class VistaHotel extends javax.swing.JFrame {
             
             ingVenta = new Ingventa();
             
+            Date date = new Date();
+            DateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
+            String fechaR = formatoFecha.format(jdcFecha.getDate());
+            
             //ingVenta.setIdlog(userLog);
-            ingVenta.setFecha(jdcFecha.getDate().toString());
+            ingVenta.setFecha(fechaR);
             ingVenta.setHabitacion(jtfHabitacion.getText().toUpperCase());
             ingVenta.setValor(Double.parseDouble(jtfValor.getText().toUpperCase()));
             ingVenta.setTiempo(jcbTiempo.getSelectedItem().toString());
             ingVenta.setTipo(jcbTipo.getSelectedItem().toString());
+            ingVenta.setDatetime(date);
             ingVenta.setEstado(1);
             ctrlVenta.create(ingVenta);
-            JOptionPane.showMessageDialog(null, "Usuario creado con exito!");
+            JOptionPane.showMessageDialog(null, "Venta guardada con EXITO!");
             
             limpiar();
             
@@ -94,7 +104,63 @@ public class VistaHotel extends javax.swing.JFrame {
         }
     }
     
+    private DefaultTableModel getModelo() {
+        DefaultTableModel modelo = new DefaultTableModel(
+                null, new String[]{"entidad", "Fecha", "Habitación", "Valor", "Tiempo", "Tipo"}) {
+            Class[] types = new Class[]{
+                java.lang.Object.class,
+                java.lang.String.class,
+                java.lang.String.class,
+                java.lang.Double.class,
+                java.lang.String.class,
+                java.lang.String.class,};
+
+            boolean[] canEdit = new boolean[]{
+                false, false, false, false, false, false
+            };
+
+            @Override
+            public Class getColumnClass(int columnIndex) {
+                return types[columnIndex];
+            }
+
+            @Override
+            public boolean isCellEditable(int rowIndex, int colIndex) {
+                return canEdit[colIndex];
+            }
+        };
+        return modelo;
+    }
+    
+    public static void setOcultarColumnas(JTable tbl, int columna[]) {
+        for (int i = 0; i < columna.length; i++) {
+            tbl.getColumnModel().getColumn(columna[i]).setMaxWidth(0);
+            tbl.getColumnModel().getColumn(columna[i]).setMinWidth(0);
+            tbl.getTableHeader().getColumnModel().getColumn(columna[i]).setMaxWidth(0);
+            tbl.getTableHeader().getColumnModel().getColumn(columna[i]).setMinWidth(0);
+        }
+    }
+    
+    private void setCargarTabla() {
+        model = getModelo();
+        jTable2.setModel(model);
+        jTable2.getTableHeader().setReorderingAllowed(false);
+        jTable2.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        setOcultarColumnas(jTable2, new int[]{0});
+//        jTable2.getColumnModel().getColumn(1).setMinWidth(100);
+//        jTable2.getTableHeader().getColumnModel().getColumn(1).setMaxWidth(100);
+//        jTable2.getColumnModel().getColumn(2).setMinWidth(100);
+//        jTable2.getTableHeader().getColumnModel().getColumn(2).setMaxWidth(100);
+//        jTable2.getColumnModel().getColumn(3).setMinWidth(100);
+//        jTable2.getTableHeader().getColumnModel().getColumn(3).setMaxWidth(100);
+//        jTable2.getColumnModel().getColumn(4).setMinWidth(180);
+//        jTable2.getTableHeader().getColumnModel().getColumn(4).setMaxWidth(180);
+//        jTable2.getColumnModel().getColumn(5).setMinWidth(50);
+//        jTable2.getTableHeader().getColumnModel().getColumn(5).setMaxWidth(50);
+    }
+    
     private void limpiar() {
+        jdcFecha.setDate(null);
         jtfHabitacion.setText("");
         jtfValor.setText("");
         jcbTiempo.setSelectedIndex(0);
@@ -109,7 +175,7 @@ public class VistaHotel extends javax.swing.JFrame {
         jtfHabitacion = new javax.swing.JTextField();
         jtfValor = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jtTabla = new javax.swing.JTable();
+        jTable2 = new javax.swing.JTable();
         jbNuevo = new javax.swing.JButton();
         jbAgregar = new javax.swing.JButton();
         jcbTiempo = new javax.swing.JComboBox<>();
@@ -123,20 +189,20 @@ public class VistaHotel extends javax.swing.JFrame {
 
         jtfValor.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Valor", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 12))); // NOI18N
 
-        jtTabla.setModel(new javax.swing.table.DefaultTableModel(
+        jTable2.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Fecha", "Habitación", "Valor", "Tiempo", "Tipo"
+
             }
         ));
-        jtTabla.addKeyListener(new java.awt.event.KeyAdapter() {
+        jTable2.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
-                jtTablaKeyPressed(evt);
+                jTable2KeyPressed(evt);
             }
         });
-        jScrollPane1.setViewportView(jtTabla);
+        jScrollPane1.setViewportView(jTable2);
 
         jbNuevo.setText("Nuevo");
         jbNuevo.addActionListener(new java.awt.event.ActionListener() {
@@ -247,9 +313,9 @@ public class VistaHotel extends javax.swing.JFrame {
         limpiar();
     }//GEN-LAST:event_jbNuevoActionPerformed
 
-    private void jtTablaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jtTablaKeyPressed
+    private void jTable2KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTable2KeyPressed
        
-    }//GEN-LAST:event_jtTablaKeyPressed
+    }//GEN-LAST:event_jTable2KeyPressed
 
     private void jbBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbBuscarActionPerformed
 
@@ -264,13 +330,18 @@ public class VistaHotel extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable jTable2;
     private javax.swing.JButton jbAgregar;
     private javax.swing.JButton jbBuscar;
     private javax.swing.JButton jbNuevo;
     private javax.swing.JComboBox<String> jcbTiempo;
     private javax.swing.JComboBox<String> jcbTipo;
+<<<<<<< HEAD
     private org.netbeans.modules.form.InvalidComponent jdcFecha;
     private javax.swing.JTable jtTabla;
+=======
+    private com.toedter.calendar.JDateChooser jdcFecha;
+>>>>>>> e701c30175e545b04ab3241f55ba716f77b7e916
     private javax.swing.JTextField jtfHabitacion;
     private javax.swing.JTextField jtfValor;
     // End of variables declaration//GEN-END:variables
